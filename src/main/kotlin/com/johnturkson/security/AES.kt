@@ -15,7 +15,7 @@ fun ByteArray.encryptAESGCM256(key: SecretKey): ByteArray {
 
 fun ByteArray.decryptAESGCM256(key: SecretKey): ByteArray {
     val algorithm = "AES/GCM/NoPadding"
-    val encryptedData = this.parseEncryptedData()
+    val encryptedData = this.parseAESEncryptedData()
     val initializationVector = this.parseGCMInitializationVector()
     return encryptedData.decrypt(algorithm, key, initializationVector)
 }
@@ -53,7 +53,7 @@ private fun generateGCMInitializationVector(): GCMParameterSpec {
     return GCMParameterSpec(tagLength, nonce)
 }
 
-private fun generateNonce(size: Int, provider: SecureRandom = SecureRandom()): ByteArray {
+private fun generateNonce(size: Int, provider: SecureRandom = SecureRandom.getInstanceStrong()): ByteArray {
     return ByteArray(size).apply { provider.nextBytes(this) }
 }
 
@@ -64,7 +64,7 @@ private fun ByteArray.parseGCMInitializationVector(): GCMParameterSpec {
     return GCMParameterSpec(tagLength, this.copyOfRange(offset, initializationVectorLength))
 }
 
-private fun ByteArray.parseEncryptedData(): ByteArray {
+private fun ByteArray.parseAESEncryptedData(): ByteArray {
     val initializationVectorLength = 12
     return this.copyOfRange(initializationVectorLength, this.size)
 }
